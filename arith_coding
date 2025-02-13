@@ -1,0 +1,44 @@
+
+"""
+@author: William Silva
+"""
+
+import numpy as np
+
+class ArithmeticCoding:
+    def __init__(self, alphabet, probabilities):
+
+        self.alphabet = alphabet
+        self.probabilities = probabilities
+        self.cum_prob = np.cumsum([0] + self.probabilities)
+    
+    def decode_message(self, lower_limit, message_length):
+
+        decoded_message = []
+        current_value = lower_limit
+        
+        for _ in range(message_length):
+
+            for i in range(len(self.alphabet)):
+                if self.cum_prob[i] <= current_value < self.cum_prob[i+1]:
+                    decoded_message.append(self.alphabet[i])
+                    interval_low = self.cum_prob[i]
+                    interval_high = self.cum_prob[i+1]
+                    current_value = (current_value - interval_low) / (interval_high - interval_low)
+                    break
+                
+        return decoded_message
+
+alphabet = ['A', 'B', 'C', 'D', 'E']
+probabilities = [0.45, 0.25, 0.15, 0.10, 0.05]
+
+ac = ArithmeticCoding(alphabet, probabilities)
+m1_lower_limit = 0.31425
+m1_length = 8
+m1_decoded = ac.decode_message(m1_lower_limit, m1_length)
+m2_lower_limit = 0.7771623
+m2_length = 14
+m2_decoded = ac.decode_message(m2_lower_limit, m2_length)
+
+print("Message m1:", ''.join(m1_decoded))
+print("Message m2:", ''.join(m2_decoded))
